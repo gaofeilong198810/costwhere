@@ -21,7 +21,9 @@ def load_bill_into_list_zfb(input_file):
     for item in result_list:
         if item['交易对方'].startswith('友宝售货机'):
             item['交易对方'] = '友宝售货机'
-    return [item for item in result_list if item['交易状态'] == '交易成功' and item['收/支'] == '支出' and item['交易对方'] not in free_charge_counterparty]
+    return [item for item in result_list if item['交易状态'] == '交易成功' and \
+                                            item['收/支'] == '支出' and \
+                                            item['交易对方'] not in free_charge_counterparty_zfb]
 
 
 def load_category():
@@ -33,7 +35,7 @@ def load_category():
     return result_dict
 
 
-def add_bill_category(bill_list):
+def add_bill_category_zfb(bill_list):
     category_dict = load_category()
     for item in bill_list:
         if item['交易对方'] in category_dict:
@@ -62,12 +64,51 @@ def write_bill_as_csv(bill_list, filename):
             new_value = [item[h] for h in new_header]
             file.write(','.join(new_value) + '\n')
 
+def load_bill_into_list_wx(input_file):
+    header = None
+    contents = []
+    result_list = []
+    with open(input_file, encoding='utf8') as file:
+        for line in file:
+            if line.startswith('交易时间'):
+                header = [h.strip() for h in line.split(',')[:-1]]
+            elif line.startswith('20') and len(line.split(',')[0]) == 19:
+                contents.append([item.strip() for item in line.split(',')[:-1]])
+            else:
+                # print('-------------invalid line---------------', line)
+                pass
+    for item in contents:
+        result_list.append(dict(zip(header, item)))
+    # for item in result_list:
+    #     if item['交易对方'].startswith('友宝售货机'):
+    #         item['交易对方'] = '友宝售货机'
+    valid_trade = {'商户消费', '微信红包', '扫二维码付款', '群收款', '转账', '转账到银行卡', '零钱提现'}
+    return [item for item in result_list if item['交易类型'] in valid_trade and item['收/支'] == '支出' and item['交易对方'] not in free_charge_counterparty_wx]
+
+def add_bill_category_wx(bill_list):
+    category_dict = load_category()
+    for item in bill_list:
+        if item['交易对方'] in category_dict:
+            item['类别1'] = category_dict[item['交易对方']]['category1']
+            item['类别2'] = category_dict[item['交易对方']]['category2']
+        elif item['交易来源地'] == '淘宝':
+            item['类别1'] = '网购'
+            item['类别2'] = '淘宝天猫'
+        else:
+            item['类别1'] = '未分类消费'
+            item['类别2'] = '未分类消费'
+
 if __name__ == '__main__':
     print('start...')
-    input_file_zfb = '../bills/zfb_gfl_20190101_20191020.csv'
-    bill_list = load_bill_into_list_zfb(input_file_zfb)
-    # print(len(bill_list), bill_list)
-    add_bill_category(bill_list)
-    # print(len(bill_list), bill_list)
-    write_bill_as_csv(bill_list, '../output/' + os.path.basename(input_file_zfb))
+    # input_file_zfb = '../bills/支付宝/zfb_gfl_20190101_20191020.csv'
+    # bill_list_zfb = load_bill_into_list_zfb(input_file_zfb)
+    # # print(len(bill_list_zfb), bill_list_zfb)
+    # add_bill_category_zfb(bill_list_zfb)
+    # # print(len(bill_list_zfb), bill_list_zfb)
+    # write_bill_as_csv(bill_list_zfb, '../output/支付宝/' + os.path.basename(input_file_zfb))
+
+    input_file_wx = '../bills/微信/微信支付账单(20190101-20190401)/微信支付账单(20190101-20190401).csv'
+    bill_list_wx = load_bill_into_list_wx(input_file_wx)
+    print(len(bill_list_wx), bill_list_wx)
+    add_bill_category_wx(bill_list_wx)
     print('done!!!')

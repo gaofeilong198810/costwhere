@@ -112,7 +112,7 @@ counterparty_category = {
     },
 }
 
-free_charge_counterparty = {
+free_charge_counterparty_zfb = {
     '北京停简单信息技术有限公司',
     '阿里云',
     '网商银行',
@@ -123,4 +123,7 @@ free_charge_counterparty = {
     '剑(张剑)',
     '云武(张云武)',
     '大千食·融合料理',
+}
+
+free_charge_counterparty_wx = {
 }
