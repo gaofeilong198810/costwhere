@@ -26,7 +26,7 @@ def load_bill_into_list_zfb(input_file):
     return [item for item in result_list if
             item['交易状态'] == '交易成功' and
             item['收/支'] == '支出' and
-            item['交易对方'] not in free_charge_counterparty_zfb]
+            item['交易对方'] not in free_charge_counterparty]
 
 
 def load_category():
@@ -54,7 +54,7 @@ def add_bill_category_zfb(bill_list):
 
 def write_bill_as_csv_zfb(bill_list, filename):
     new_header = [
-        '交易创建时间', '交易对方', '商品名称', '类别1', '类别2', '金额（元）', '交易状态', '收/支',
+        '交易创建时间', '类别1', '类别2', '交易对方', '商品名称', '金额（元）', '交易状态', '收/支',
         '类型', '交易号', '商家订单号', '付款时间', '最近修改时间', '交易来源地', '服务费（元）', '成功退款（元）', '备注', '资金状态',
     ]
 
@@ -93,7 +93,7 @@ def load_bill_into_list_wx(input_dir):
             item['交易类型'] in valid_trade and
             item['收/支'] == '支出' and
             item['当前状态'] == '支付成功' and
-            item['交易对方'] not in free_charge_counterparty_wx]
+            item['交易对方'] not in free_charge_counterparty]
 
 
 def add_bill_category_wx(bill_list):
@@ -112,7 +112,7 @@ def add_bill_category_wx(bill_list):
 
 def write_bill_as_csv_wx(bill_list, filename):
     new_header = [
-        '交易时间', '交易对方', '商品', '类别1', '类别2', '金额(元)', '当前状态', '收/支', '支付方式', '交易类型', '交易单号', '商户单号'
+        '交易时间', '类别1', '类别2', '交易对方', '商品', '金额(元)', '当前状态', '收/支', '支付方式', '交易类型', '交易单号', '商户单号'
     ]
 
     if not os.path.exists(os.path.dirname(filename)):
@@ -124,22 +124,58 @@ def write_bill_as_csv_wx(bill_list, filename):
             new_value = [item[h] for h in new_header]
             file.write(','.join(new_value) + '\n')
 
+
+def merge_bill_list(bill_list_zfb, bill_list_wx):
+    bill_list_all = []
+    new_header = ['交易时间', '类别1', '类别2', '交易对方', '商品', '金额', '支付方式']
+    for item in bill_list_zfb:
+        common_header = ['交易创建时间', '类别1', '类别2', '交易对方', '商品名称', '金额（元）']
+        bill_in_common_header = [item[header] for header in common_header]
+        bill_dict = dict(zip(new_header, bill_in_common_header))
+        bill_dict['支付方式'] = '支付宝'
+        bill_list_all.append(bill_dict)
+    for item in bill_list_wx:
+        common_header = ['交易时间', '类别1', '类别2', '交易对方', '商品', '金额(元)']
+        bill_in_common_header = [item[header] for header in common_header]
+        bill_dict = dict(zip(new_header, bill_in_common_header))
+        bill_dict['支付方式'] = '微信'
+        bill_list_all.append(bill_dict)
+    return bill_list_all
+
+
+def write_bill_as_csv_all(bill_list, filename):
+    if not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
+
+    with open(filename, 'w', encoding='gb18030') as file:
+        file.write(','.join(bill_list[0].keys()) + '\n')
+        for item in bill_list:
+            file.write(','.join(item.values()) + '\n')
+
 if __name__ == '__main__':
     print('start...')
+    # 支付宝
     input_file_zfb = '../bills/支付宝/支付宝_高飞龙_20190101_20191020.csv'
     bill_list_zfb = load_bill_into_list_zfb(input_file_zfb)
-    print(len(bill_list_zfb), bill_list_zfb)
-    print(print(json.dumps(bill_list_zfb, indent=2, ensure_ascii=False)))
+    # print(len(bill_list_zfb), bill_list_zfb)
+    # print(print(json.dumps(bill_list_zfb, indent=2, ensure_ascii=False)))
     add_bill_category_zfb(bill_list_zfb)
-    print(len(bill_list_zfb), bill_list_zfb)
+    # print(len(bill_list_zfb), bill_list_zfb)
+    # print(print(json.dumps(bill_list_zfb, indent=2, ensure_ascii=False)))
     write_bill_as_csv_zfb(bill_list_zfb, '../output/支付宝/' + os.path.basename(input_file_zfb))
 
+    # 微信
     input_file_wx = '../bills/微信/高飞龙_微信_20190101_20191021'
     bill_list_wx = load_bill_into_list_wx(input_file_wx)
-    print(len(bill_list_wx), bill_list_wx)
-    print(print(json.dumps(bill_list_wx, indent=2, ensure_ascii=False)))
+    # print(len(bill_list_wx), bill_list_wx)
+    # print(print(json.dumps(bill_list_wx, indent=2, ensure_ascii=False)))
     add_bill_category_wx(bill_list_wx)
-    print(len(bill_list_wx), bill_list_wx)
-    print(print(json.dumps(bill_list_wx, indent=2, ensure_ascii=False)))
+    # print(len(bill_list_wx), bill_list_wx)
+    # print(print(json.dumps(bill_list_wx, indent=2, ensure_ascii=False)))
     write_bill_as_csv_wx(bill_list_wx, '../output/微信/高飞龙_微信_20190101_20191021.csv')
+
+    # 合并
+    bill_list_all = merge_bill_list(bill_list_zfb, bill_list_wx)
+    write_bill_as_csv_all(bill_list_all, '../output/全部/高飞龙_全部_20190101_20191020.csv')
+    # print(bill_list_all)
     print('done!!!')
