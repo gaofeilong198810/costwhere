@@ -48,7 +48,7 @@ def add_bill_category_zfb(bill_list):
             item['类别1'] = '网购'
             item['类别2'] = '淘宝天猫'
         else:
-            item['类别1'] = '未分类消费'
+            item['类别1'] = '餐饮日用'
             item['类别2'] = '未分类消费'
 
 
@@ -103,7 +103,7 @@ def add_bill_category_wx(bill_list):
             item['类别1'] = category_dict[item['交易对方']]['category1']
             item['类别2'] = category_dict[item['交易对方']]['category2']
         else:
-            item['类别1'] = '未分类消费'
+            item['类别1'] = '餐饮日用'
             item['类别2'] = '未分类消费'
         if item['交易对方'] == '/':
             item['类别1'] = '红包'
