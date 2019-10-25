@@ -155,27 +155,27 @@ def write_bill_as_csv_all(bill_list, filename):
 if __name__ == '__main__':
     print('start...')
     # 支付宝
-    input_file_zfb = '../bills/支付宝/支付宝_高飞龙_20190101_20191020.csv'
-    bill_list_zfb = load_bill_into_list_zfb(input_file_zfb)
-    # print(len(bill_list_zfb), bill_list_zfb)
-    # print(print(json.dumps(bill_list_zfb, indent=2, ensure_ascii=False)))
-    add_bill_category_zfb(bill_list_zfb)
-    # print(len(bill_list_zfb), bill_list_zfb)
-    # print(print(json.dumps(bill_list_zfb, indent=2, ensure_ascii=False)))
-    write_bill_as_csv_zfb(bill_list_zfb, '../output/支付宝/' + os.path.basename(input_file_zfb))
-
+    input_file_zfb_gfl = '../bills/支付宝/支付宝_高飞龙_20190101_20191020.csv'
+    bill_list_zfb_gfl = load_bill_into_list_zfb(input_file_zfb_gfl)
+    add_bill_category_zfb(bill_list_zfb_gfl)
+    write_bill_as_csv_zfb(bill_list_zfb_gfl, '../output/支付宝/' + os.path.basename(input_file_zfb_gfl))
+    input_file_zfb_jsy = '../bills/支付宝/支付宝_姜斯茵_20190101_20191025.csv'
+    bill_list_zfb_jsy = load_bill_into_list_zfb(input_file_zfb_jsy)
+    add_bill_category_zfb(bill_list_zfb_jsy)
+    write_bill_as_csv_zfb(bill_list_zfb_jsy, '../output/支付宝/' + os.path.basename(input_file_zfb_jsy))
     # 微信
-    input_file_wx = '../bills/微信/高飞龙_微信_20190101_20191021'
-    bill_list_wx = load_bill_into_list_wx(input_file_wx)
-    # print(len(bill_list_wx), bill_list_wx)
-    # print(print(json.dumps(bill_list_wx, indent=2, ensure_ascii=False)))
-    add_bill_category_wx(bill_list_wx)
-    # print(len(bill_list_wx), bill_list_wx)
-    # print(print(json.dumps(bill_list_wx, indent=2, ensure_ascii=False)))
-    write_bill_as_csv_wx(bill_list_wx, '../output/微信/高飞龙_微信_20190101_20191021.csv')
-
+    input_file_wx_gfl = '../bills/微信/高飞龙_微信_20190101_20191021'
+    bill_list_wx_gfl = load_bill_into_list_wx(input_file_wx_gfl)
+    add_bill_category_wx(bill_list_wx_gfl)
+    write_bill_as_csv_wx(bill_list_wx_gfl, '../output/微信/高飞龙_微信_20190101_20191021.csv')
+    input_file_wx_jsy = '../bills/微信/姜斯茵_微信_20190101_20191025'
+    bill_list_wx_jsy = load_bill_into_list_wx(input_file_wx_jsy)
+    add_bill_category_wx(bill_list_wx_jsy)
+    write_bill_as_csv_wx(bill_list_wx_jsy, '../output/微信/姜斯茵_微信_20190101_20191025.csv')
     # 合并
-    bill_list_all = merge_bill_list(bill_list_zfb, bill_list_wx)
-    write_bill_as_csv_all(bill_list_all, '../output/全部/高飞龙_全部_20190101_20191020.csv')
-    # print(bill_list_all)
+    bill_list_all_gfl = merge_bill_list(bill_list_zfb_gfl, bill_list_wx_gfl)
+    write_bill_as_csv_all(bill_list_all_gfl, '../output/全部/高飞龙_全部_20190101_20191020.csv')
+    bill_list_all_jsy = merge_bill_list(bill_list_zfb_jsy, bill_list_wx_jsy)
+    write_bill_as_csv_all(bill_list_all_jsy, '../output/全部/姜斯茵_全部_20190101_20191025.csv')
+
     print('done!!!')
