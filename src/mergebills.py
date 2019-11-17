@@ -154,10 +154,10 @@ def merge_all(input_file_zfb_gfl, input_dir_wx_gfl, input_file_zfb_jsy, input_di
 
 if __name__ == '__main__':
     print('start...')
-    input_date_zfb_gfl = '20190101_20191026'
-    input_date_wx_gfl = '20190101_20191026'
-    input_date_zfb_jsy = '20190101_20191025'
-    input_date_wx_jsy = '20190101_20191025'
+    input_date_zfb_gfl = '20190101_20191117'
+    input_date_wx_gfl = '20190101_20191117'
+    input_date_zfb_jsy = '20190101_20191117'
+    input_date_wx_jsy = '20190101_20191117'
     input_file_zfb_gfl = '../bills/支付宝/高飞龙_支付宝_{}.csv'.format(input_date_zfb_gfl)
     input_dir_wx_gfl = '../bills/微信/高飞龙_微信_{}'.format(input_date_wx_gfl)
     input_file_zfb_jsy = '../bills/支付宝/姜斯茵_支付宝_{}.csv'.format(input_date_zfb_jsy)
