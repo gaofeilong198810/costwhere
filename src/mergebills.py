@@ -154,19 +154,16 @@ def merge_all(input_file_zfb_gfl, input_dir_wx_gfl, input_file_zfb_jsy, input_di
 
 if __name__ == '__main__':
     print('start...')
-    input_date_zfb_gfl = '20190101_20191117'
-    input_date_wx_gfl = '20190101_20191117'
-    input_date_zfb_jsy = '20190101_20191117'
-    input_date_wx_jsy = '20190101_20191117'
-    input_file_zfb_gfl = '../bills/支付宝/高飞龙_支付宝_{}.csv'.format(input_date_zfb_gfl)
-    input_dir_wx_gfl = '../bills/微信/高飞龙_微信_{}'.format(input_date_wx_gfl)
-    input_file_zfb_jsy = '../bills/支付宝/姜斯茵_支付宝_{}.csv'.format(input_date_zfb_jsy)
-    input_dir_wx_jsy = '../bills/微信/姜斯茵_微信_{}'.format(input_date_wx_jsy)
-    output_file_zfb = '../output/支付宝/支付宝_全部.csv'
-    output_file_wx = '../output/微信/微信_全部.csv'
-    output_file_gfl = '../output/高飞龙/高飞龙_全部.csv'
-    output_file_jsy = '../output/姜斯茵/姜斯茵_全部.csv'
-    output_file_all = '../output/全部/全部.csv'
+    date_range = '20190101_20191203'
+    input_file_zfb_gfl = '../bills/支付宝/高飞龙_支付宝_{}.csv'.format(date_range)
+    input_dir_wx_gfl   = '../bills/微信/高飞龙_微信_{}'.format(date_range)
+    input_file_zfb_jsy = '../bills/支付宝/姜斯茵_支付宝_{}.csv'.format(date_range)
+    input_dir_wx_jsy   = '../bills/微信/姜斯茵_微信_{}'.format(date_range)
+    output_file_zfb    = '../output/支付宝/支付宝_全部.csv'
+    output_file_wx     = '../output/微信/微信_全部.csv'
+    output_file_gfl    = '../output/高飞龙/高飞龙_全部.csv'
+    output_file_jsy    = '../output/姜斯茵/姜斯茵_全部.csv'
+    output_file_all    = '../output/全部/全部.csv'
     # 合并
     merge_zfb(input_file_zfb_gfl, input_file_zfb_jsy, output_file_zfb)
     merge_wx(input_dir_wx_gfl, input_dir_wx_jsy, output_file_wx)
