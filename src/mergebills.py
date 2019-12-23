@@ -42,9 +42,14 @@ def load_bills_zfb(input_file_zfb):
             new_item['主类别'] = '网购'
             new_item['子类别'] = '淘宝天猫'
         else:
-            new_item['主类别'] = '餐饮日用'
-            new_item['子类别'] = '未分类消费'
+            if '餐' in new_item['交易对方'] or '餐' in new_item['商品名称']:
+                new_item['主类别'] = '餐饮日用'
+                new_item['子类别'] = '餐饮'
+            else:
+                new_item['主类别'] = '餐饮日用'
+                new_item['子类别'] = '未分类消费'
         result_list.append(new_item)
+    # print(result_list)
     return result_list
 
 
@@ -77,8 +82,12 @@ def load_bills_wx(input_dir_wx):
             new_item['主类别'] = category_dict[new_item['交易对方']]['category1']
             new_item['子类别'] = category_dict[new_item['交易对方']]['category2']
         else:
-            new_item['主类别'] = '餐饮日用'
-            new_item['子类别'] = '未分类消费'
+            if '餐' in new_item['交易对方'] or '餐' in new_item['商品']:
+                new_item['主类别'] = '餐饮日用'
+                new_item['子类别'] = '餐饮'
+            else:
+                new_item['主类别'] = '餐饮日用'
+                new_item['子类别'] = '未分类消费'
         if new_item['交易对方'] == '/':
             new_item['主类别'] = '红包'
             new_item['子类别'] = '红包'
@@ -154,7 +163,7 @@ def merge_all(input_file_zfb_gfl, input_dir_wx_gfl, input_file_zfb_jsy, input_di
 
 if __name__ == '__main__':
     print('start...')
-    date_range = '20190101_20191203'
+    date_range = '20190101_20191223'
     input_file_zfb_gfl = '../bills/支付宝/高飞龙_支付宝_{}.csv'.format(date_range)
     input_dir_wx_gfl   = '../bills/微信/高飞龙_微信_{}'.format(date_range)
     input_file_zfb_jsy = '../bills/支付宝/姜斯茵_支付宝_{}.csv'.format(date_range)
