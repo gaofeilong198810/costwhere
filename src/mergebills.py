@@ -163,7 +163,7 @@ def merge_all(input_file_zfb_gfl, input_dir_wx_gfl, input_file_zfb_jsy, input_di
 
 if __name__ == '__main__':
     print('start...')
-    date_range = '20190101_20191223'
+    date_range = '20190101_20200109'
     input_file_zfb_gfl = '../bills/支付宝/高飞龙_支付宝_{}.csv'.format(date_range)
     input_dir_wx_gfl   = '../bills/微信/高飞龙_微信_{}'.format(date_range)
     input_file_zfb_jsy = '../bills/支付宝/姜斯茵_支付宝_{}.csv'.format(date_range)
