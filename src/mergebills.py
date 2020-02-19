@@ -1,6 +1,6 @@
 import os
 from os.path import *
-from src.category import *
+from category import *
 
 
 def load_category():
@@ -12,23 +12,30 @@ def load_category():
     return result_dict
 
 
-def load_bills_zfb(input_file_zfb):
+def load_bills_zfb(input_dir_zfb):
     header = None
     contents = []
     result_list = []
-    name = basename(input_file_zfb).split('_')[0]
+    name = input_dir_zfb.split('/')[-2]
     if name not in {'高飞龙', '姜斯茵'}:
         raise Exception('不能识别的姓名: ', name)
 
-    with open(input_file_zfb) as file_zfb:
-        for line in file_zfb:
-            if line.startswith('交易号'):
-                header = [h.strip() for h in line.split(',')[:-1]]
-            elif line.startswith('2019') or line.startswith('202'):
-                contents.append([item.strip() for item in line.split(',')[:-1]])
-            else:
-                # print('不能识别的内容: ', line)
-                pass
+    input_files = []
+    for root, dirs, files in os.walk(input_dir_gfl_zfb):
+        if len(files) != 0:
+            for file in files:
+                input_files.append(f'{root}/{file}')
+
+    for input_file in input_files:
+        with open(input_file) as file:
+            for line in file:
+                if line.startswith('交易号'):
+                    header = [h.strip() for h in line.split(',')[:-1]]
+                elif line.startswith('2019') or line.startswith('202'):
+                    contents.append([item.strip() for item in line.split(',')[:-1]])
+                else:
+                    # print('不能识别的内容: ', line)
+                    pass
 
     category_dict = load_category()
     for item in contents:
@@ -57,11 +64,15 @@ def load_bills_wx(input_dir_wx):
     header = None
     contents = []
     result_list = []
-    name = basename(input_dir_wx).split('_')[0]
+    name = input_dir_wx.split('/')[-2]
     if name not in {'高飞龙', '姜斯茵'}:
         raise Exception('不能识别的姓名: ', name)
 
-    input_files = [root + '/' + files[0] for root, dirs, files in os.walk(input_dir_wx) if len(files) != 0]
+    input_files = []
+    for root, dirs, files in os.walk(input_dir_wx):
+        if len(files) != 0:
+            for file in files:
+                input_files.append(f'{root}/{file}')
     for input_file in input_files:
         with open(input_file, encoding='utf8') as file:
             for line in file:
@@ -92,6 +103,7 @@ def load_bills_wx(input_dir_wx):
             new_item['主类别'] = '红包'
             new_item['子类别'] = '红包'
         result_list.append(new_item)
+        # print(result_list)
     return result_list
 
 
@@ -115,68 +127,74 @@ def select_common_columns(bill_list):
 def write_as_csv(bill_list, filename):
     if not exists(dirname(filename)):
         os.makedirs(dirname(filename))
-    with open(filename, 'w', encoding='gb18030') as file:
+    with open(filename, 'w', encoding='utf8') as file:
         file.write(','.join(bill_list[0].keys()) + '\n')
         for item in bill_list:
             file.write(','.join(item.values()) + '\n')
 
 
-def merge_zfb(input_file_zfb_gfl, input_file_zfb_jsy, output_file_zfb):
-    bill_list_zfb_gfl = load_bills_zfb(input_file_zfb_gfl)
-    bill_list_zfb_jsy = load_bills_zfb(input_file_zfb_jsy)
+def merge_zfb(input_dir_gfl_zfb, input_file_jsy_zfb, output_file_zfb):
+    bill_list_zfb_gfl = load_bills_zfb(input_dir_gfl_zfb)
+    bill_list_zfb_jsy = load_bills_zfb(input_file_jsy_zfb)
     write_as_csv(bill_list_zfb_gfl + bill_list_zfb_jsy, output_file_zfb)
 
 
-def merge_wx(input_dir_wx_gfl, input_dir_wx_jsy, output_file_wx):
-    bill_list_wx_gfl = load_bills_wx(input_dir_wx_gfl)
-    bill_list_wx_jsy = load_bills_wx(input_dir_wx_jsy)
+def merge_wx(input_dir_gfl_wx, input_dir_jsy_wx, output_file_wx):
+    bill_list_wx_gfl = load_bills_wx(input_dir_gfl_wx)
+    bill_list_wx_jsy = load_bills_wx(input_dir_jsy_wx)
     write_as_csv(bill_list_wx_gfl + bill_list_wx_jsy, output_file_wx)
 
 
-def merge_gfl(input_file_zfb_gfl, input_dir_wx_gfl, output_file_gfl):
-    bill_list_zfb_gfl = select_common_columns(load_bills_zfb(input_file_zfb_gfl))
-    bill_list_wx_gfl = select_common_columns(load_bills_wx(input_dir_wx_gfl))
+def merge_gfl(input_dir_gfl_zfb, input_dir_gfl_wx, output_file_gfl):
+    bill_list_zfb_gfl = select_common_columns(load_bills_zfb(input_dir_gfl_zfb))
+    bill_list_wx_gfl = select_common_columns(load_bills_wx(input_dir_gfl_wx))
     write_as_csv(bill_list_wx_gfl + bill_list_zfb_gfl, output_file_gfl)
 
 
-def merge_jsy(input_file_zfb_jsy, input_dir_wx_jsy, output_file_jsy):
-    bill_list_zfb_jsy = select_common_columns(load_bills_zfb(input_file_zfb_jsy))
-    bill_list_wx_jsy = select_common_columns(load_bills_wx(input_dir_wx_jsy))
+def merge_jsy(input_file_jsy_zfb, input_dir_jsy_wx, output_file_jsy):
+    bill_list_zfb_jsy = select_common_columns(load_bills_zfb(input_file_jsy_zfb))
+    bill_list_wx_jsy = select_common_columns(load_bills_wx(input_dir_jsy_wx))
     write_as_csv(bill_list_wx_jsy + bill_list_zfb_jsy, output_file_jsy)
 
 
-def merge_all(input_file_zfb_gfl, input_dir_wx_gfl, input_file_zfb_jsy, input_dir_wx_jsy, output_file_all):
-    bill_list_zfb_gfl = select_common_columns(load_bills_zfb(input_file_zfb_gfl))
-    bill_list_wx_gfl = select_common_columns(load_bills_wx(input_dir_wx_gfl))
-    bill_list_zfb_jsy = select_common_columns(load_bills_zfb(input_file_zfb_jsy))
-    bill_list_wx_jsy = select_common_columns(load_bills_wx(input_dir_wx_jsy))
+def merge_all(input_dir_gfl_zfb, input_dir_gfl_wx, input_dir_jsy_zfb, input_dir_jsy_wx, output_file_all):
+    bill_list_zfb_gfl = select_common_columns(load_bills_zfb(input_dir_gfl_zfb))
+    bill_list_wx_gfl = select_common_columns(load_bills_wx(input_dir_gfl_wx))
+    bill_list_zfb_jsy = select_common_columns(load_bills_zfb(input_dir_jsy_zfb))
+    bill_list_wx_jsy = select_common_columns(load_bills_wx(input_dir_jsy_wx))
 
     result_list = []
     for item in bill_list_zfb_gfl + bill_list_wx_gfl + bill_list_zfb_jsy + bill_list_wx_jsy:
-        if item['收支'] == '支出' and \
-                item['交易对方'] not in free_charge_counterparty and \
-                not item['订单ID'] in free_charge_trade_id and \
-                item['交易状态'] in {'支付成功', '交易成功'}:
+        if item['交易对方'] not in free_charge_counterparty and \
+                item['订单ID'] not in free_charge_trade_id and \
+                item['收支'] in {'收入', '支出'} and \
+                item['交易状态'] in {'支付成功', '交易成功', '已存入零钱'}:
             result_list.append(item)
     write_as_csv(result_list, output_file_all)
 
 
 if __name__ == '__main__':
     print('start...')
-    date_range = '20190101_20200109'
-    input_file_zfb_gfl = '../bills/支付宝/高飞龙_支付宝_{}.csv'.format(date_range)
-    input_dir_wx_gfl   = '../bills/微信/高飞龙_微信_{}'.format(date_range)
-    input_file_zfb_jsy = '../bills/支付宝/姜斯茵_支付宝_{}.csv'.format(date_range)
-    input_dir_wx_jsy   = '../bills/微信/姜斯茵_微信_{}'.format(date_range)
-    output_file_zfb    = '../output/支付宝/支付宝_全部.csv'
-    output_file_wx     = '../output/微信/微信_全部.csv'
-    output_file_gfl    = '../output/高飞龙/高飞龙_全部.csv'
-    output_file_jsy    = '../output/姜斯茵/姜斯茵_全部.csv'
-    output_file_all    = '../output/全部/全部.csv'
+    # date_range = '20190101_20200109'
+    input_dir_gfl_zfb = '../bills/高飞龙/支付宝'
+    input_dir_gfl_wx = '../bills/高飞龙/微信'
+    input_dir_jsy_zfb = '../bills/姜斯茵/支付宝'
+    input_dir_jsy_wx = '../bills/姜斯茵/微信'
+    output_file_all = '../output/全部.csv'
+    merge_all(input_dir_gfl_zfb, input_dir_gfl_wx, input_dir_jsy_zfb, input_dir_jsy_wx, output_file_all)
+
+    # input_dir_gfl_wx   = '../bills/微信/高飞龙_微信_{}'.format(date_range)
+    # input_file_jsy_zfb = '../bills/支付宝/姜斯茵_支付宝_{}.csv'.format(date_range)
+    # input_dir_jsy_wx   = '../bills/微信/姜斯茵_微信_{}'.format(date_range)
+    # output_file_zfb    = '../output/支付宝/支付宝_全部.csv'
+    # output_file_wx     = '../output/微信/微信_全部.csv'
+    # output_file_gfl    = '../output/高飞龙/高飞龙_全部.csv'
+    # output_file_jsy    = '../output/姜斯茵/姜斯茵_全部.csv'
+    # output_file_all    = '../output/全部/全部.csv'
     # 合并
-    merge_zfb(input_file_zfb_gfl, input_file_zfb_jsy, output_file_zfb)
-    merge_wx(input_dir_wx_gfl, input_dir_wx_jsy, output_file_wx)
-    merge_gfl(input_file_zfb_gfl, input_dir_wx_gfl, output_file_gfl)
-    merge_jsy(input_file_zfb_jsy, input_dir_wx_jsy, output_file_jsy)
-    merge_all(input_file_zfb_gfl, input_dir_wx_gfl, input_file_zfb_jsy, input_dir_wx_jsy, output_file_all)
+    # merge_zfb(input_dir_gfl_zfb, input_file_jsy_zfb, output_file_zfb)
+    # merge_wx(input_dir_gfl_wx, input_dir_jsy_wx, output_file_wx)
+    # merge_gfl(input_dir_gfl_zfb, input_dir_gfl_wx, output_file_gfl)
+    # merge_jsy(input_file_jsy_zfb, input_dir_jsy_wx, output_file_jsy)
+    # merge_all(input_dir_gfl_zfb, input_dir_gfl_wx, input_dir_jsy_zfb, input_dir_jsy_wx, output_file_all)
     print('done!!!')
